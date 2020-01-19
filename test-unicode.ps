@@ -1,0 +1,32 @@
+(../ps-steal/steal.ps) run
+
+(./)(unicode.ps) steal
+
+%(eskd-font.ps) stealfile
+
+
+
+%unicode length ==
+
+
+/str (xПодъём с затонувшего эсминца легкобьющейся древнегреческой амфоры сопряжён с техническими трудностями) def
+/points str utf8points def
+
+points ==
+
+% (form-a4.ps) run
+
+% in2mm
+
+
+% /eskd-b-font findfont
+% 3 scalefont
+% setfont
+
+
+% /conv-str points fencode def
+
+
+% 30 250 moveto 
+% str utf8points fshow
+

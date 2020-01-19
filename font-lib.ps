@@ -1,0 +1,48 @@
+%Библиотека процедур, полезныъ при создании шрифтов
+
+% Создать пустой массив кодировки
+/create-encoding {
+	[
+		/.notdef
+		0 1 7 {
+			1 exch bitshift
+			copy
+		} for
+	]
+} def
+
+%Копирует значения из from в into, причём /.notdef считается отсутствием значения и не копируется
+%[from, into]
+/merge-encoding {
+	0 dict begin
+		/into exch def
+		/from exch def
+		/len 
+			into length 
+			from length
+			2 copy
+			le
+			{
+				pop
+			}
+			{
+				exch pop
+			}
+			ifelse
+		def
+		
+		0 1 len 1 sub {
+			/i exch def
+			from i get 
+			/.notdef eq not
+			{
+				into i from i get put
+			}
+			if
+			
+		}for
+		
+		into
+	end
+} def
+%[into]

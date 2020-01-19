@@ -1,0 +1,89 @@
+%Прототип для шрифтов типа 3
+%Содержит реализации всех общих для шрифтов типа 3 процедур
+%Для создания на его базе шрифтов, необходимо добавить
+% /FontMatrix /Encoding /CharProcs
+
+/font3-base
+<<
+	/FontType 3
+	
+	/FontBBox [0 0 0 0] %Потом заменить реальными значениями
+	
+	%Запускается для отрисовки символа
+	%[this, charName]
+	/BuildGlyph {
+		
+		%[this, charName]
+		1 index 
+		%[this, charName, this]
+		begin
+			%[this, charName]
+			CharProcs
+			%[this, charName, this.CharProcs]
+			exch % Get CharProcs dictionary
+			
+			%[this, this.CharProcs, charName]
+			2 copy known not % See if charname is known
+			{
+				pop /.notdef
+			}
+			if
+		
+			%[this, this.CharProcs, charName]
+			dup /.notdef eq
+			{
+				pop pop pop
+			}
+			{
+				%[this, this.CharProcs, charName]
+
+				%dup ==
+				dup 4 1 roll
+				%[this, this.CharProcs, charName]
+				get
+				%[this, this.CharProcs.charName]
+				
+				CharProcs begin
+				0 dict begin %Объявляем словарь для внутренних нужд глифа
+				
+				%[this, this.CharProcs.charName]
+				beforeGliph
+				exec % Execute BuildGlyph procedure with [this]
+				afterGliph
+				
+				end
+				end
+				
+				%[this]
+				currentdict eq not
+				{
+					==
+				}
+				{
+					pop
+				}
+				ifelse
+				
+			}
+			ifelse
+		end
+		
+	}
+	
+	/beforeGliph{
+	}
+	/afterGliph{
+	}
+	
+	%Устаревшая схема, для совместимости
+	%[this, charCode]
+	/BuildChar {
+		1 index /Encoding get
+		%[this, charCode, this.Encoding]
+		exch get
+		%[this, charName]
+		1 index /BuildGlyph get 
+		%[this, charName, this.BuildGlyph]
+		exec
+	} bind
+>> def

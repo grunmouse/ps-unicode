@@ -1,0 +1,194 @@
+
+(unicode-dict.ps) stealfile
+(../ps-lib/)(traverse.ps) steal
+(font-lib.ps) stealfile %Возможно, стоит заинлайнить
+
+/unicode-name unicode invert def
+
+%Расшифровывает байт кодировки utf8, выделяя количество ведущих единиц
+% и значение смысловой части
+%[int]
+/utf8byte{
+	0
+	{
+		%[int, count]
+		1 7 2 index	sub bitshift
+		%[int, count, mask]
+		2 index and
+		%[int, count, int and mask]
+		0 eq
+		{
+			%[int, count]
+			exit
+		} if
+		%[int, count]
+		dup 4 eq
+		{
+			exit
+		}if
+		1 add
+		
+	} loop
+	%[int, count]
+	exch 
+	1 7 3 index sub
+	%[count, int, 1, 7 - count]
+	
+	bitshift 1 sub
+	%[count, int, mask]
+	and
+	exch
+	%[value, count]
+} def
+%[value, count]
+
+%Преобразовывает utf8-строку в кодовые точки и выгружает их в стек
+%Следует использовать для сборки массивов кодовых точек из нескольких строк
+%[str]
+/utf8load {
+	{
+		%[prev, byte]
+		utf8byte
+		%[prev, value, count]
+		1 eq
+		{
+			%then
+			%[prev, value]
+			exch
+			6 bitshift
+			or
+			%[{prev|value}]
+		}
+		{
+			%else
+			%[prev, value]
+		}
+		ifelse
+	}
+	forall
+} def
+%[array]
+
+%Преобразовывает utf8-строку в массив кодовых точек utf
+%[str]
+/utf8points {
+	[
+		exch
+		utf8load
+	]
+} def
+%[array]
+
+%[codePoints, encoding]
+/utfToStr {
+	0 dict begin
+		/encoding exch def
+		/arr exch def
+		/str arr length string def
+		
+		arr
+		{
+			exch
+			encoding exch 
+			intcvn
+			safeGet
+			exch
+		}
+		str
+		mappairs
+	end
+} def
+
+%Добавляет в шрифт словарь кодовых точек для преобразования массивов в строки
+%[font]
+/utf-font {
+	dup
+	begin
+		/UEncoding
+			Encoding 
+			{
+				%[name, index]
+				exch
+				dup
+				/.notdef eq
+				{
+					pop pop
+					null null
+				}
+				{
+					unicode exch get
+					intcvn
+					%[index, codepoint]
+				}
+				ifelse
+			}
+			<<>>
+			mappairs
+		def
+	end
+} def
+%[font]
+
+%@param {array<int>} points - массив номеров кодовых точек
+%Создаёт новый словарь, содержащий 
+% /Encoding {array<name>}
+% /UEncoding {dict<(int cvnint).int>}
+%
+%[points]
+/encoding-from-points {
+	%[code set]
+	0 dict begin
+		/points exch def
+		/point-set
+			[
+				0
+				points aload pop
+			]
+			unique shaker-sort 
+		def
+		<<
+			/Encoding 
+				point-set unicode-name map-with-dict 
+				create-encoding
+				merge-encoding
+		
+			/UEncoding point-set invert
+		>>
+	end
+} def
+
+%Перекодировать массив кодовых точек в строку с помощью UEncoding текущего шрифта
+%@param {array<int>} points
+%@return {string}
+%[points]
+/fencode {
+	currentfont	/UEncoding get
+	utfToStr 
+} def
+
+%Если текущий шрифт - UTF-ный, преобразует строку из utf8 в кодировку текущего шрифта
+%Если нет - оставляет неизменным.
+%[str]
+/utf8encode {
+	currentfont /UEncoding known
+	{
+		utf8points fencode 
+	}
+	if
+}
+
+/fshow {
+	fencode show
+} def
+
+/fstringwidth {
+	fencode stringwidth
+} def
+
+/utf8show {
+	utf8encode show
+} def
+
+/utf8stringwidth {
+	utf8encode stringwidth
+} def
