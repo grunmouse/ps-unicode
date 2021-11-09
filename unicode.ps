@@ -172,7 +172,13 @@
 /utf8encode {
 	currentfont /UEncoding known
 	{
-		utf8points fencode 
+		dup type
+		<<
+			/stringtype{ utf8points }
+			/arraytype { }
+		>>
+		exch get exec
+		fencode 
 	}
 	if
 } def
