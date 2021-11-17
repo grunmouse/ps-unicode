@@ -183,14 +183,6 @@
 	if
 } def
 
-/fshow {
-	fencode show
-} def
-
-/fstringwidth {
-	fencode stringwidth
-} def
-
 /utf8show {
 	utf8encode show
 } def
@@ -198,3 +190,15 @@
 /utf8stringwidth {
 	utf8encode stringwidth
 } def
+
+/fontheight { 
+	currentfont /ScaleMatrix get 3 get
+} def
+
+% для строки возвращает пару длина высота шрифта
+% [str]
+/utf8stringsize {
+	utf8stringwidth pop
+	fontheight
+} def
+%[width, height]
