@@ -185,20 +185,26 @@
 
 /utf8show {
 	utf8encode show
-} def
+} bind def
 
 /utf8stringwidth {
 	utf8encode stringwidth
-} def
+} bind def
 
 /fontheight { 
 	currentfont /ScaleMatrix get 3 get
-} def
+} bind def
 
 % для строки возвращает пару длина высота шрифта
 % [str]
 /utf8stringsize {
 	utf8stringwidth pop
 	fontheight
-} def
+} bind def
 %[width, height]
+
+/stringsize /utf8stringsize load def
+
+% !!! Перекрытие стандартных функций !!!
+/show /utf8show load def
+/stringwidth /utf8stringwidth load def
