@@ -1,0 +1,89 @@
+%
+% Команды отрисовки шрифта Type3 в обход команды show
+%
+
+
+%Отрисовывает глиф
+%[font, gliphname] 
+/gliphto {
+	0 dict begin
+		/gliphname exch def
+		/font-dict exch def
+		/font-matrix font-dict /FontMatrix get def
+		/scope currentdict def
+		/setcachedevice {
+			0 dict begin
+				/ury exch def
+				/urx exch def
+				/lly exch def
+				/llx exch def
+				/wy exch def
+				/wx exch def
+				%wx wy setcharwidth
+				%llx lly urx ury rectclip  % Обрезать область
+				scope /wx wx put
+				scope /wy wy put
+			end
+		} def
+		gsave
+			font-matrix concat
+			currentpoint translate 
+
+			font-dict gliphname
+			gsave
+				font-dict /BuildGlyph get exec
+			grestore
+			
+		grestore
+		wx wy font-matrix transform
+		rmoveto
+	end
+} def
+
+%Отрисовывает строку
+%[string/array, font]
+/show-as-curve {
+	0 dict begin
+		/font-dict exch def
+		dup type
+		/stringtype eq
+		{utf8points}
+		if
+		{
+			%point
+			unicode-name exch intcvn get
+			font-dict exch gliphto
+		}forall
+	end
+} def
+
+%Измеряет длину строки
+%[string/array, font]
+/calc-string-width {
+	0 dict begin
+		/stroke { } def
+		/fill { } def
+		/eofill { } def
+		/show { pop } def
+		/ashow { pop pop pop } def
+		/widthshow { pop pop pop pop } def
+		/awidthshow { pop pop pop pop pop } def
+		/kshow { pop pop } def
+		/xshow { pop pop } def
+		/yshow { pop pop } def
+		/xyshow { pop pop } def
+		/glyphshow { pop } def
+		/image { 5 {pop} repeat } def
+		/imagemask { 5 {pop} repeat } def
+		/colorimage { 6 {pop} repeat } def
+		/showpage { } def
+		/copypage { } def
+		/erasepage { } def
+		
+		gsave
+			0 0 moveto
+			show-as-curve
+			currentpoint pop
+		grestore
+	end
+} def

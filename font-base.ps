@@ -45,12 +45,14 @@
 				
 				CharProcs begin
 				0 dict begin %Объявляем словарь для внутренних нужд глифа
+				gsave
 				
 				%[this, this.CharProcs.charName]
 				beforeGliph
 				exec % Execute BuildGlyph procedure with [this]
 				afterGliph
 				
+				grestore
 				end
 				end
 				
